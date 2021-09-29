@@ -1,6 +1,13 @@
 
 import unittest
 
+## Name : Lexi Fogel
+## Student ID: 76881512
+## Your Email: lfogel@umich.edu
+## People you worked with :
+## Github URL : https://github.com/SI206-UMich/hw-4-fall2021-lexifogel
+
+
 # The Customer class
 # The Customer class represents a customer who will order from the stalls.
 class Customer: 
@@ -28,7 +35,8 @@ class Customer:
     # Submit_order takes a cashier, a stall and an amount as parameters, 
     # it deducts the amount from the customer’s wallet and calls the receive_payment method on the cashier object
     def submit_order(self, cashier, stall, amount): 
-        pass
+        self.wallet -= amount
+        cashier.receive_payment(stall, amount)
 
     # The __str__ method prints the customer's information.    
     def __str__(self):
@@ -72,7 +80,39 @@ class Cashier:
 ## Complete the Stall class here following the instructions in HW_4_instructions_rubric
 class Stall:
     
-    pass
+    def __init__(self, name, inventory, cost=7, earnings=0):
+        self.name = name
+        self.inventory = inventory
+        self.cost = cost 
+        self.earnings = earnings
+
+    def process_order(self, name, quantity):
+        if quantity > self.inventory[name]:
+            self.inventory[name] -= quantity
+            self.earnings += (self.cost * quantity)
+
+    def has_item(self, name, quantity):
+        if name in self.inventory:
+            if self.inventory[name] >= quantity:
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def stock_up(self, name, quantity):
+        if name in self.inventory.keys():
+            self.inventory[name] += quantity
+        else:
+            self.inventory[name] = quantity
+
+    def compute_cost(self, quantity):
+        total = self.cost * quantity
+        return total
+
+    def __str__(self):
+        return "Hello, we are " + self.name + "This is the current menu " + self.inventory.keys() + "We charge $ " + str(self.cost) + "per item. We have $" + str(self.earnings) + " in total"
+
 
 
 class TestAllMethods(unittest.TestCase):
@@ -147,30 +187,39 @@ class TestAllMethods(unittest.TestCase):
     def test_compute_cost(self):
         #what's wrong with the following statements?
         #can you correct them?
-        self.assertEqual(self.s1.compute_cost(self.s1,5), 51)
-        self.assertEqual(self.s3.compute_cost(self.s3,6), 45)
+        self.assertEqual(self.s1.compute_cost(5), 50)
+        self.assertEqual(self.s3.compute_cost(6), 42)
 
 	# Check that the stall can properly see when it is empty
     def test_has_item(self):
-        # Set up to run test cases
-
         # Test to see if has_item returns True when a stall has enough items left
         # Please follow the instructions below to create three different kinds of test cases 
-        # Test case 1: the stall does not have this food item: 
         
+        # Test case 1: the stall does not have this food item: 
+        self.assertEqual(self.s1.has_item('Pizza', 10), False)
+
         # Test case 2: the stall does not have enough food item: 
+        self.assertEqual(self.s1.has_item('Burger', 60), False)
         
         # Test case 3: the stall has the food item of the certain quantity: 
-        pass
+        self.assertEqual(self.s1.has_item('Burger', 10), True)
 
 	# Test validate order
     def test_validate_order(self):
 		# case 1: test if a customer doesn't have enough money in their wallet to order
+        self.f1.wallet = 10
+        self.f1.validate_order(self.c1, self.s1, 'Burger', 15)
+        self.assertEqual(self.f1.wallet, 10)
 
 		# case 2: test if the stall doesn't have enough food left in stock
+        self.f1.wallet = 200
+        self.f1.validate_order(self.c1, self.s1, 'Burger', 50)
+        self.assertEqual(self.f1.wallet, 200)
 
 		# case 3: check if the cashier can order item from that stall
-        pass
+        self.f1.wallet = 200
+        self.f1.validate_order(self.c1, self.s1, 'Burger', 2)
+        self.f1.wallet = 180
 
     # Test if a customer can add money to their wallet
     def test_reload_money(self):
@@ -180,17 +229,43 @@ class TestAllMethods(unittest.TestCase):
 def main():
     #Create different objects 
 
+    # inventories
+    healthy_inventory = {'apple': 8, 'salad': 7, 'carrot': 8}
+    junk_inventory = {'burger': 5, 'fries': 10, 'milkshake': 9}
+
+	# customer : self, name, wallet (default 100)
+    lexi = Customer('Lexi', 150)
+    ryan = Customer('Ryan', 75)
+    aleks = Customer('Aleks')
+
+	# stall : self, name, inventory, cost=7, earnings=0
+    healthy_food = Stall('healthy_food', healthy_inventory, 10, 100)
+    junk_food = Stall('junk_food', junk_inventory, 15, 200)
+
+    # cashier : self, name, directory =[]
+    barb = Cashier('Barb', [healthy_food])
+    eliana = Cashier('Eliana', [junk_food])
+	
+
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
     #case 1: the cashier does not have the stall 
-    
+    lexi.validate_order(barb, junk_food, 'apple', 3)
+    aleks.validate_order(barb, junk_food, 'apple', 3)
+    ryan.validate_order(barb, junk_food, 'apple', 3)
+
     #case 2: the casher has the stall, but not enough ordered food or the ordered food item
-    
+    aleks.validate_order(barb, healthy_food, 'apple', 10)
+
     #case 3: the customer does not have enough money to pay for the order: 
+    ryan.validate_order(barb, healthy_food, 'apple', 8)
     
     #case 4: the customer successfully places an order
+    # validate_order : self, cashier, stall, item_name, quantity    
+    lexi.validate_order(barb, healthy_food, 'apple', 3)
+    ryan.validate_order(eliana, junk_food, 'fries', 5)
+    aleks.validate_order(barb, healthy_food, 'carrot', 6)
 
-    pass
 
 if __name__ == "__main__":
 	main()
