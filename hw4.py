@@ -163,13 +163,13 @@ class TestAllMethods(unittest.TestCase):
         
     def test_make_payment(self):
 		# Check to see how much money there is prior to a payment
-        previous_custormer_wallet = self.f2.wallet
+        previous_customer_wallet = self.f2.wallet
         previous_earnings_stall = self.s2.earnings
         
         self.f2.submit_order(self.c1, self.s2, 30)
 
 		# See if money has changed hands
-        self.assertEqual(self.f2.wallet, previous_custormer_wallet - 30)
+        self.assertEqual(self.f2.wallet, previous_customer_wallet - 30)
         self.assertEqual(self.s2.earnings, previous_earnings_stall + 30)
 
 
@@ -219,11 +219,14 @@ class TestAllMethods(unittest.TestCase):
 		# case 3: check if the cashier can order item from that stall
         self.f1.wallet = 200
         self.f1.validate_order(self.c1, self.s1, 'Burger', 2)
-        self.f1.wallet = 180
+        self.assertEqual(self.f1.wallet, 180)
 
     # Test if a customer can add money to their wallet
     def test_reload_money(self):
-        pass
+        self.f1.wallet = 20
+        self.f1.reload_money(30)
+        self.assertEqual(self.f1.wallet, 50)
+
     
 ### Write main function
 def main():
