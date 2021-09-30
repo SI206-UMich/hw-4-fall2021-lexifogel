@@ -4,7 +4,7 @@ import unittest
 ## Name : Lexi Fogel
 ## Student ID: 76881512
 ## Your Email: lfogel@umich.edu
-## People you worked with :
+## People you worked with : Ryan Baxter, ALeks Duni
 ## Github URL : https://github.com/SI206-UMich/hw-4-fall2021-lexifogel
 
 
@@ -68,7 +68,19 @@ class Cashier:
 	# The cashier pays the stall the cost.
 	# The stall processes the order
 	# Function returns cost of the order, using compute_cost method
+
+    # def place_order(self, stall, item, quantity):
+    #     stall.process_order(item, quantity)
+    #     return stall.compute_cost(quantity) 
+
     def place_order(self, stall, item, quantity):
+        import random
+        customer_number = 0
+        if customer_number % 10 == 0:
+            lottery = random.randrange(1, 20)
+            if lottery == 1:
+                Customer.reload_money(10)
+        customer_number += 1
         stall.process_order(item, quantity)
         return stall.compute_cost(quantity) 
     
